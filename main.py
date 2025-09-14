@@ -237,6 +237,8 @@ def format_message(record, personal=False):
             f"<blockquote>{flag} <b>New {sender} OTP Received</b></blockquote>\n"
             f"<blockquote><b>Time:</b> {dt}</blockquote>\n"
             f"<blockquote><b>Country:</b> {country} {flag}</blockquote>\n"
+            f"<blockquote><b>Service:</b> {sender}</blockquote>\n"
+          
             f"<blockquote><b>Number:</b> {mask_number(number)}</blockquote>\n"
             f"<blockquote>{otp_line}</blockquote>"
             f"<blockquote><b>Full Message:</b></blockquote>\n"

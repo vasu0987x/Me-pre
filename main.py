@@ -16,7 +16,7 @@ import time
 
 # ---------------- CONFIG ----------------
 BOT_TOKEN = "8435058741:AAFsd5srA-THvQ1tUb-qr3AoOaXjIvnpZH4"
-ADMIN_ID = 7665143902
+ADMIN_ID = 6483088050
 bot = telebot.TeleBot(BOT_TOKEN)
 
 DATA_FILE = "bot_data.json"
@@ -27,8 +27,8 @@ os.makedirs(NUMBERS_DIR, exist_ok=True)
 API_TOKEN = "Q05VRDRSQkddX1daUnWWU4RShkdJmIh2YYJph0dra2iEj29iSHGS"
 BASE_URL = "http://147.135.212.197/crapi/s1t"
 OTP_GROUP_ID = "-1002916447744"
-CHANNEL_LINK = "https://t.me/EARNINGTRICKSMASTER1"
-BACKUP = "https://t.me/TricksMastarNumbar"
+CHANNEL_LINK = "https://t.me/tricksmasterotp"
+BACKUP = "https://t.me/TricksMastarUnlimitedOtp_bot"
 
 # ---------------- DATA STORAGE ----------------
 data = {}
@@ -331,7 +331,7 @@ def send_random_number(chat_id, country=None, edit=False):
 
 active_users = set()
 
-REQUIRED_CHANNELS = ["@ddxotp", "@vasuhub"]  # Add more as needed
+REQUIRED_CHANNELS = ["@EARNINGTRICKSMASTER1", "@day1chennel"]  # Add more as needed
   # Replace with your main channel username
 
 @bot.message_handler(commands=["start"])

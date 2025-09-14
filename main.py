@@ -513,8 +513,12 @@ def admin_help(message):
 def run_bot():
     bot.infinity_polling()
 
-if __name__ == "__main__":
-    threading.Thread(target=run_flask).start()
-    threading.Thread(target=run_bot).start()
+def start_background_tasks():
+    threading.Thread(target=run_bot, daemon=True).start()
     threading.Thread(target=sender_worker, daemon=True).start()
     threading.Thread(target=main_loop, daemon=True).start()
+
+if __name__ == "__main__":
+    start_background_tasks()
+    port = int(os.environ.get("PORT", 5000))  # Koyeb gives PORT env
+    app.run(host="0.0.0.0", port=port)

@@ -306,26 +306,75 @@ def main_loop():
 
 # ---------------- USER BOT FUNCTIONS ----------------
 def send_random_number(chat_id, country=None, edit=False):
+last_change_time = {}  # chat_id -> timestamp
+
+def send_random_number(chat_id, country=None, edit=False):
+    now = time.time()
+    # ✅ Check cooldown
+    if chat_id in last_change_time and now - last_change_time[chat_id] < 10:
+        wait = 10 - int(now - last_change_time[chat_id])
+
+        # पुराना message निकालो
+        if chat_id in user_messages:
+            old_msg = user_messages[chat_id].text
+
+            # अगर पहले से "⏳ Please wait" है तो उसे replace कर दो
+            if "⏳ Please wait" in old_msg:
+                new_text = re.sub(r"⏳ Please wait.*", f"⏳ Please wait {wait} sec before changing number again.", old_msg)
+            else:
+                new_text = old_msg + f"\n\n⏳ Please wait {wait} sec before changing number again."
+
+            bot.edit_message_text(
+                new_text,
+                chat_id,
+                user_messages[chat_id].message_id,
+                reply_markup=user_messages[chat_id].reply_markup,
+                parse_mode="Markdown"
+            )
+        else:
+            bot.send_message(chat_id, f"⏳ Please wait {wait} sec before changing number again.")
+        return
+
+    # ✅ Update time
+    last_change_time[chat_id] = now
+
+    # If no country given, take last selected
     if country is None:
         country = user_current_country.get(chat_id)
         if not country:
             bot.send_message(chat_id, "❌ No country selected.")
             return
+
     numbers = numbers_by_country.get(country, [])
     if not numbers:
         bot.send_message(chat_id, f"❌ No numbers for {country}.")
         return
+
+    # Pick random number
     number = random.choice(numbers)
     user_current_country[chat_id] = country
     user_numbers[number] = chat_id  # assign number to user
 
-    text = f"📞 Number for *{country}*:\n`{number}`\n\n Waiting For OTP...📱"
+    # Message text
+    text = f"📞 Number for *{country}*:\n`{number}`\n\n⏳ Waiting For OTP...📱"
+
+    # Inline buttons
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("🔄 Change Number", callback_data="change_number"))
     markup.add(types.InlineKeyboardButton("🌍 Change Country", callback_data="change_country"))
 
+    # Edit existing message if possible
     if chat_id in user_messages:
-        bot.edit_message_text(text, chat_id, user_messages[chat_id].message_id, reply_markup=markup, parse_mode="Markdown")
+        bot.edit_message_text(
+            text,
+            chat_id,
+            user_messages[chat_id].message_id,
+            reply_markup=markup,
+            parse_mode="Markdown"
+        )
+        # Update stored message object
+        user_messages[chat_id].text = text
+        user_messages[chat_id].reply_markup = markup
     else:
         msg = bot.send_message(chat_id, text, reply_markup=markup, parse_mode="Markdown")
         user_messages[chat_id] = msg

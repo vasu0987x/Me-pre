@@ -305,7 +305,7 @@ def main_loop():
 
 
 # ---------------- USER BOT FUNCTIONS ----------------
-def send_random_number(chat_id, country=None, edit=False):
+
 last_change_time = {}  # chat_id -> timestamp
 
 def send_random_number(chat_id, country=None, edit=False):

@@ -571,5 +571,5 @@ def start_background_tasks():
 
 if __name__ == "__main__":
     start_background_tasks()
-    port = int(os.environ.get("PORT", 5000))  # Koyeb gives PORT env
+    port = int(os.environ.get("PORT", 8080))  # Koyeb gives PORT env
     app.run(host="0.0.0.0", port=port)

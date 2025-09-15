@@ -301,7 +301,7 @@ def main_loop():
                     msg_personal, kb, _ = format_message(record, personal=True)
                     message_queue.put((msg_personal, [chat_id], kb))
 
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 
 # ---------------- USER BOT FUNCTIONS ----------------

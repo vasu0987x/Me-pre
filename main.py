@@ -312,7 +312,7 @@ def send_random_number(chat_id, country=None, edit=False):
     now = time.time()
     # ✅ Check cooldown
     if chat_id in last_change_time and now - last_change_time[chat_id] < 10:
-        wait = 10 - int(now - last_change_time[chat_id])
+        wait = 03 - int(now - last_change_time[chat_id])
 
         # पुराना message निकालो
         if chat_id in user_messages:

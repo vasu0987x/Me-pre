@@ -22,11 +22,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 API_TOKEN = os.getenv("API_TOKEN") 
 MONGO_URI = os.getenv("MONGO_URI")
 
-ADMIN_ID = int(os.getenv("ADMIN_ID", "6102951142"))
+ADMIN_ID = int(os.getenv("ADMIN_ID", "6483088050"))
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-OTP_GROUP_ID = os.getenv("OTP_GROUP_ID", "-1002866392973")
+OTP_GROUP_ID = os.getenv("OTP_GROUP_ID", "-1002784314709")
 BACKUP = "https://t.me/TricksMastarNumbar"
 CHANNEL_LINK = "https://t.me/TRICKSMASTEROTP2_bot"
 

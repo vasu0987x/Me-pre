@@ -18,9 +18,9 @@ import phonenumbers
 import pycountry
 
 # ---------------- CONFIG ----------------
-BOT_TOKEN = os.getenv("BOT_TOKEN") or "6910226896:AAGwWdHzZXhLUUDwhjMDIYH7oOMApzLXTlc"
-API_TOKEN = os.getenv("API_TOKEN") or "SFdYRDRSQkhTeG9nXGJsiolXjVRbVWhphldja0GUZ4N_goN7Q3Z4"
-MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://vasubot:vasubot@cluster0.fpchqfc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+BOT_TOKEN = os.getenv("BOT_TOKEN") 
+API_TOKEN = os.getenv("API_TOKEN") 
+MONGO_URI = os.getenv("MONGO_URI")
 
 ADMIN_ID = int(os.getenv("ADMIN_ID", "6102951142"))
 

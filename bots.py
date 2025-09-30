@@ -333,17 +333,29 @@ def save_new_country(message, numbers):
     bot.reply_to(message, f"✅ Saved {added} numbers under *{country}*", parse_mode="Markdown")
     temp_uploads.pop(message.from_user.id, None)
 
+def safe_send(chat_id, text, **kwargs):
+    try:
+        return bot.send_message(chat_id, text, **kwargs)
+    except telebot.apihelper.ApiTelegramException as e:
+        if e.error_code == 403:  # user blocked bot
+            print(f"❌ User {chat_id} blocked the bot. Skipping.")
+            active_users.discard(chat_id)
+            users_col.update_one({"chat_id": chat_id}, {"$set": {"blocked": True}})
+            return None
+        else:
+            raise  # baaki errors same throw hone dena
+
+
 @bot.message_handler(commands=["start"])
 def start(message):
     chat_id = message.chat.id
 
     if message.from_user.id == ADMIN_ID:
-        bot.send_message(chat_id, "👋 Welcome Admin!\nUse /adminhelp for commands.")
+        safe_send(chat_id, "👋 Welcome Admin!\nUse /adminhelp for commands.")
         return
 
     active_users.add(chat_id)
 
-    # Check required channels (keep your list in REQUIRED_CHANNELS env or static)
     REQUIRED_CHANNELS = os.getenv("REQUIRED_CHANNELS", "@EARNINGTRICKSMASTER1,@day1chennel").split(",")
     not_joined = []
     for channel in REQUIRED_CHANNELS:
@@ -361,19 +373,21 @@ def start(message):
         markup = types.InlineKeyboardMarkup()
         for ch in not_joined:
             markup.add(types.InlineKeyboardButton(f"🚀 Join {ch}", url=f"https://t.me/{ch.lstrip('@')}"))
-        bot.send_message(chat_id, "❌ You must join all required channels to use the bot.", reply_markup=markup)
+        safe_send(chat_id, "❌ You must join all required channels to use the bot.", reply_markup=markup)
         return
 
     countries = get_all_countries()
     if not countries:
-        bot.send_message(chat_id, "❌ No countries available yet.")
+        safe_send(chat_id, "❌ No countries available yet.")
         return
 
     markup = types.InlineKeyboardMarkup()
     for country in countries:
         markup.add(types.InlineKeyboardButton(country, callback_data=f"user_select_{country}"))
-    msg = bot.send_message(chat_id, "🌍 Choose a country:", reply_markup=markup)
-    user_messages[chat_id] = msg
+    msg = safe_send(chat_id, "🌍 Choose a country:", reply_markup=markup)
+    if msg:
+        user_messages[chat_id] = msg
+
 
 # single callback handler for user actions
 @bot.callback_query_handler(func=lambda call: True)

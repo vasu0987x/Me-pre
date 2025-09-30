@@ -37,7 +37,7 @@ temp_uploads = {}      # admin_id -> list of numbers (in-memory)
 user_messages = {}     # chat_id -> telebot message object (in-memory)
 last_change_time = {}  # chat_id -> timestamp (cooldown)
 active_users = set()   # in-memory active users set
-
+blocked_users = set()  # In-memory set of blocked chat_ids
 # ---------------- MONGO SETUP ----------------
 client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 db = client["otp_bot"]

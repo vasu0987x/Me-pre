@@ -307,43 +307,28 @@ def handle_document(message):
     bot.reply_to(message, "📂 File received. Select country to add numbers:", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data and call.data.startswith("addto_"))
-def callback_addto(call):
-    if call.from_user.id != ADMIN_ID:
-        return bot.answer_callback_query(call.id, "❌ Not authorized")
-    numbers = temp_uploads.get(call.from_user.id, [])
-    if not numbers:
-        return bot.answer_callback_query(call.id, "❌ No uploaded numbers found")
-
-    choice = call.data[6:]
-    if choice == "new":
-        bot.send_message(call.message.chat.id, "✍️ Send new country name:")
-        bot.register_next_step_handler(call.message, save_new_country, numbers)
-    else:
-        added = add_numbers_to_country(choice, numbers)
-        bot.edit_message_text(f"✅ Added {added} numbers to *{choice}*",
-                              call.message.chat.id, call.message.message_id, parse_mode="Markdown")
-        temp_uploads.pop(call.from_user.id, None)
-
-def save_new_country(message, numbers):
-    country = message.text.strip()
-    if not country:
-        return bot.reply_to(message, "❌ Invalid country name.")
-    added = add_numbers_to_country(country, numbers)
-    set_current_country(country)
-    bot.reply_to(message, f"✅ Saved {added} numbers under *{country}*", parse_mode="Markdown")
-    temp_uploads.pop(message.from_user.id, None)
-
 @bot.message_handler(commands=["start"])
 def start(message):
     chat_id = message.chat.id
 
+    if chat_id in blocked_users:
+        print(f"Skipping start command for chat_id {chat_id}: Bot is blocked.")
+        return
+
     if message.from_user.id == ADMIN_ID:
-        bot.send_message(chat_id, "👋 Welcome Admin!\nUse /adminhelp for commands.")
+        try:
+            bot.send_message(chat_id, "👋 Welcome Admin!\nUse /adminhelp for commands.")
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.error_code == 403:
+                print(f"Cannot send admin welcome message to chat_id {chat_id}: Bot is blocked.")
+                blocked_users.add(chat_id)
+            else:
+                print(f"Telegram API error in start (admin): {e}")
         return
 
     active_users.add(chat_id)
 
-    # Check required channels (keep your list in REQUIRED_CHANNELS env or static)
+    # Check required channels
     REQUIRED_CHANNELS = os.getenv("REQUIRED_CHANNELS", "@EARNINGTRICKSMASTER1,@day1chennel").split(",")
     not_joined = []
     for channel in REQUIRED_CHANNELS:
@@ -354,26 +339,52 @@ def start(message):
             member = bot.get_chat_member(channel, chat_id)
             if member.status not in ["member", "creator", "administrator"]:
                 not_joined.append(channel)
-        except Exception:
-            not_joined.append(channel)
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.error_code == 403:
+                print(f"Cannot check channel {channel} for chat_id {chat_id}: Bot is blocked.")
+                not_joined.append(channel)  # Assume not joined if blocked
+            else:
+                print(f"Error checking channel {channel} for chat_id {chat_id}: {e}")
+                not_joined.append(channel)
 
     if not_joined:
         markup = types.InlineKeyboardMarkup()
         for ch in not_joined:
             markup.add(types.InlineKeyboardButton(f"🚀 Join {ch}", url=f"https://t.me/{ch.lstrip('@')}"))
-        bot.send_message(chat_id, "❌ You must join all required channels to use the bot.", reply_markup=markup)
+        try:
+            bot.send_message(chat_id, "❌ You must join all required channels to use the bot.", reply_markup=markup)
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.error_code == 403:
+                print(f"Cannot send channel join message to chat_id {chat_id}: Bot is blocked.")
+                blocked_users.add(chat_id)
+            else:
+                print(f"Telegram API error in start (channel join): {e}")
         return
 
     countries = get_all_countries()
     if not countries:
-        bot.send_message(chat_id, "❌ No countries available yet.")
+        try:
+            bot.send_message(chat_id, "❌ No countries available yet.")
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.error_code == 403:
+                print(f"Cannot send no countries message to chat_id {chat_id}: Bot is blocked.")
+                blocked_users.add(chat_id)
+            else:
+                print(f"Telegram API error in start (no countries): {e}")
         return
 
     markup = types.InlineKeyboardMarkup()
     for country in countries:
         markup.add(types.InlineKeyboardButton(country, callback_data=f"user_select_{country}"))
-    msg = bot.send_message(chat_id, "🌍 Choose a country:", reply_markup=markup)
-    user_messages[chat_id] = msg
+    try:
+        msg = bot.send_message(chat_id, "🌍 Choose a country:", reply_markup=markup)
+        user_messages[chat_id] = msg
+    except telebot.apihelper.ApiTelegramException as e:
+        if e.error_code == 403:
+            print(f"Cannot send country selection message to chat_id {chat_id}: Bot is blocked.")
+            blocked_users.add(chat_id)
+        else:
+            print(f"Telegram API error in start (country selection): {e}")
 
 # single callback handler for user actions
 @bot.callback_query_handler(func=lambda call: True)

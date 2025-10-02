@@ -92,7 +92,7 @@ def send_to_telegram(msg, chat_id=OTP_GROUP_ID, kb=None):
             if r.status_code == 200:
                 return True
         except:
-            time.sleep(1)
+            time.sleep(0.1)
     return False
 
 def sender_worker():

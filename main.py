@@ -106,7 +106,7 @@ def sender_worker():
         for chat_id in chat_ids:
             send_to_telegram(msg, chat_id, kb)
         message_queue.task_done()
-        time.sleep(0.3)
+        time.sleep(0.1)
 
 
 # ---------------- ADMIN FILE UPLOAD ----------------

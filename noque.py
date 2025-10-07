@@ -341,16 +341,27 @@ def send_random_number(chat_id, country=None, edit=False):
         if chat_id in user_messages:
             old_msg = user_messages[chat_id].text
             if "⏳ Please wait" in old_msg:
-                new_text = re.sub(r"⏳ Please wait.*", f"⏳ Please wait {wait} sec before changing number again.", old_msg)
+                new_text = re.sub(
+                    r"⏳ Please wait.*",
+                    f"⏳ Please wait {wait} sec before changing number again.",
+                    old_msg
+                )
             else:
                 new_text = old_msg + f"\n\n⏳ Please wait {wait} sec before changing number again."
-            bot.edit_message_text(
-                new_text,
-                chat_id,
-                user_messages[chat_id].message_id,
-                reply_markup=user_messages[chat_id].reply_markup,
-                parse_mode="Markdown"
-            )
+
+            try:
+                bot.edit_message_text(
+                    new_text,
+                    chat_id,
+                    user_messages[chat_id].message_id,
+                    reply_markup=user_messages[chat_id].reply_markup,
+                    parse_mode="Markdown"
+                )
+            except telebot.apihelper.ApiTelegramException as e:
+                if "message is not modified" in str(e):
+                    pass  # Ignore harmless error
+                else:
+                    raise
         else:
             bot.send_message(chat_id, f"⏳ Please wait {wait} sec before changing number again.")
         return
@@ -377,15 +388,21 @@ def send_random_number(chat_id, country=None, edit=False):
     markup.add(types.InlineKeyboardButton("🌍 Change Country", callback_data="change_country"))
 
     if chat_id in user_messages:
-        bot.edit_message_text(
-            text,
-            chat_id,
-            user_messages[chat_id].message_id,
-            reply_markup=markup,
-            parse_mode="Markdown"
-        )
-        user_messages[chat_id].text = text
-        user_messages[chat_id].reply_markup = markup
+        try:
+            bot.edit_message_text(
+                text,
+                chat_id,
+                user_messages[chat_id].message_id,
+                reply_markup=markup,
+                parse_mode="Markdown"
+            )
+            user_messages[chat_id].text = text
+            user_messages[chat_id].reply_markup = markup
+        except telebot.apihelper.ApiTelegramException as e:
+            if "message is not modified" in str(e):
+                pass  # Ignore harmless error
+            else:
+                raise
     else:
         msg = bot.send_message(chat_id, text, reply_markup=markup, parse_mode="Markdown")
         user_messages[chat_id] = msg

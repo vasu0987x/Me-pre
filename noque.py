@@ -255,7 +255,7 @@ def main_loop():
             "token": API_TOKEN,
             "dt1": "1970-01-01 00:00:00",
             "dt2": "2099-12-31 23:59:59",
-            "records": 100  # Increased for bursts
+            "records": 5 # Increased for bursts
         }) or {}
         if stats.get("status") == "success":
             for record in stats["data"]:

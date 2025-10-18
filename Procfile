@@ -1,1 +1,1 @@
-web: python noque2.py
+web: python noque3.py

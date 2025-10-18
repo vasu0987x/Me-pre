@@ -105,7 +105,7 @@ def sender_worker():
         msg, chat_id, kb = message_queue.get()
         send_to_telegram(msg, chat_id, kb)
         print(f"📤 Sent to {chat_id} from queue", flush=True)
-        time.sleep(0.5)  # 0.5 sec gap
+        time.sleep(0.1)  # 0.5 sec gap
         message_queue.task_done()
 
 # ---------------- ADMIN FILE UPLOAD ----------------

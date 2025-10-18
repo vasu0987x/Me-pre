@@ -1,1 +1,1 @@
-web: python queues.py
+web: python noque2.py

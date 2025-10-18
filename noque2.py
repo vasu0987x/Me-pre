@@ -234,8 +234,8 @@ def format_message(record, personal=False):
         )
         kb = types.InlineKeyboardMarkup()
         kb.add(
-            types.InlineKeyboardButton("🚀 Main Channel", url=CHANNEL_LINK),
-            types.InlineKeyboardButton("📱 Numbers Channel", url=BACKUP)
+            types.InlineKeyboardButton("🚀 Panel", url=CHANNEL_LINK),
+            types.InlineKeyboardButton("📱 Channel", url=BACKUP)
         )
 
     return formatted, kb, number

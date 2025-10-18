@@ -304,8 +304,7 @@ def start(message):
 
     active_users.add(chat_id)
     not_joined = []
-    for channel in REQUIRED_CHANNEL
-System: S:
+    for channel in REQUIRED_CHANNELS:  # Fixed typo and added colon
         try:
             member = bot.get_chat_member(channel, chat_id)
             if member.status not in ["member", "creator", "administrator"]:

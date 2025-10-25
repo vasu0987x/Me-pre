@@ -1,1 +1,1 @@
-web: python noque3.py
+web: python sevenpanel.py

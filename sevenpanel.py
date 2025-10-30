@@ -362,26 +362,33 @@ def otp_scraper_thread():
 def group_sender_thread():
     """Send messages to public group"""
     print("🟢 Group Sender Started", flush=True)
-    
+
     while True:
         try:
+            # 🚨 Queue overflow protection
+            if group_queue.qsize() > 50:
+                dropped = group_queue.qsize()
+                with group_queue.mutex:
+                    group_queue.queue.clear()
+                print(f"⚠️ Flushed group queue (removed {dropped} old messages)", flush=True)
+
             record, fetch_time = group_queue.get()
-            
+
             msg, kb = format_group_message(record)
-            
+
             payload = {
                 "chat_id": OTP_GROUP_ID,
                 "text": msg[:4000],
                 "parse_mode": "HTML",
                 "reply_markup": kb.to_json()
             }
-            
+
             response = requests.post(
                 f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
                 json=payload,
                 timeout=5
             )
-            
+
             if response.status_code == 200:
                 delay = time.time() - fetch_time
                 print(f"✅ Group sent (delay: {delay:.2f}s)", flush=True)
@@ -392,9 +399,9 @@ def group_sender_thread():
                 group_queue.put((record, fetch_time))  # Re-queue
             else:
                 print(f"❌ Group send failed: {response.status_code}", flush=True)
-            
+
             time.sleep(0.5)  # 500ms between group messages
-            
+
         except Exception as e:
             print(f"❌ Group sender error: {e}", flush=True)
             time.sleep(1)
@@ -403,25 +410,32 @@ def group_sender_thread():
 def personal_sender_thread():
     """Send messages to individual users"""
     print("🟢 Personal Sender Started", flush=True)
-    
+
     while True:
         try:
+            # 🚨 Queue overflow protection
+            if personal_queue.qsize() > 100:
+                dropped = personal_queue.qsize()
+                with personal_queue.mutex:
+                    personal_queue.queue.clear()
+                print(f"⚠️ Flushed personal queue (removed {dropped} old messages)", flush=True)
+
             record, chat_id, fetch_time = personal_queue.get()
-            
+
             msg = format_personal_message(record)
-            
+
             payload = {
                 "chat_id": chat_id,
                 "text": msg[:4000],
                 "parse_mode": "HTML"
             }
-            
+
             response = requests.post(
                 f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
                 json=payload,
                 timeout=5
             )
-            
+
             if response.status_code == 200:
                 increment_user_stats(chat_id)
                 delay = time.time() - fetch_time
@@ -432,9 +446,9 @@ def personal_sender_thread():
                 personal_queue.put((record, chat_id, fetch_time))  # Re-queue
             else:
                 print(f"❌ DM failed for {chat_id}: {response.status_code}", flush=True)
-            
+
             time.sleep(0.2)  # 200ms between personal messages (faster)
-            
+
         except Exception as e:
             print(f"❌ Personal sender error: {e}", flush=True)
             time.sleep(1)
@@ -564,18 +578,56 @@ def broadcast_start(message):
     bot.register_next_step_handler(msg, broadcast_message)
 
 def broadcast_message(message):
-    text = message.text
-    success = fail = 0
+    if message.from_user.id != ADMIN_ID:
+        return
     
-    for user_id in active_users:
+    text = message.text.strip()
+    if not text:
+        return bot.reply_to(message, "❌ Broadcast message cannot be empty.")
+
+    users = list(active_users)
+    total = len(users)
+    if total == 0:
+        return bot.reply_to(message, "❌ No active users found.")
+
+    bot.reply_to(message, f"📢 Starting broadcast to <b>{total}</b> users...")
+
+    sent = 0
+    failed = 0
+    start_time = time.time()
+
+    progress_msg = bot.send_message(
+        message.chat.id,
+        f"📤 <b>Broadcast Progress:</b>\n\n✅ Sent: {sent}/{total}\n❌ Failed: {failed}"
+    )
+
+    for i, user_id in enumerate(users, start=1):
         try:
             bot.send_message(user_id, f"📢 <b>Broadcast:</b>\n\n{text}")
-            success += 1
-            time.sleep(0.05)
-        except:
-            fail += 1
-    
-    bot.reply_to(message, f"✅ Sent: {success}\n❌ Failed: {fail}")
+            sent += 1
+        except Exception as e:
+            failed += 1
+
+        # Update progress every 10 messages
+        if i % 10 == 0 or i == total:
+            try:
+                bot.edit_message_text(
+                    f"📤 <b>Broadcast Progress:</b>\n\n✅ Sent: {sent}/{total}\n❌ Failed: {failed}",
+                    message.chat.id,
+                    progress_msg.message_id
+                )
+            except:
+                pass
+        
+        time.sleep(0.1)
+
+    elapsed = time.time() - start_time
+    bot.edit_message_text(
+        f"✅ <b>Broadcast Complete!</b>\n\n📨 Sent: {sent}/{total}\n❌ Failed: {failed}\n⏱️ Time: {elapsed:.1f}s",
+        message.chat.id,
+        progress_msg.message_id
+    )
+
 
 @bot.message_handler(commands=["clearcache"])
 def clear_cache(message):

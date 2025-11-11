@@ -19,7 +19,7 @@ import hashlib
 import itertools
 
 # ==================== CONFIG ====================
-BOT_TOKEN = os.getenv("BOT_TOKEN") or "8016258575:AAGporyebTOtzmTKo6qpfc4HysElEHqAoNM"
+BOT_TOKEN = os.getenv("BOT_TOKEN") 
 ADMIN_ID = 6483088050
 bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML", num_threads=4)
 
@@ -29,7 +29,7 @@ DB_FILE = "bot_database.db"
 os.makedirs(NUMBERS_DIR, exist_ok=True)
 
 # API Config
-API_TOKEN = os.getenv("API_TOKEN") or "Q05VRDRSQkddX1daUnWWU4RShkdJmIh2YYJph0dra2iEj29iSHGS"
+API_TOKEN = os.getenv("API_TOKEN") 
 BASE_URL = "http://147.135.212.197/crapi/s1t"
 OTP_GROUP_ID = "-1002784314709"
 BACKUP = "https://t.me/TricksMastarNumbar"

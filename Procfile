@@ -1,1 +1,1 @@
-web: python sevenpanel.py
+web: python squadsms.py

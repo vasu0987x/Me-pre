@@ -91,7 +91,7 @@ temp_uploads = {}
 last_change_time = {}
 active_users = set()
 past_otp_fetch_cooldown = {}  # Rate limiting for past OTP fetches
-REQUIRED_CHANNELS = ["@EARNINGTRICKSMASTER1", "@TricksMastarBackup"]
+REQUIRED_CHANNELS = ["@EARNINGTRICKSMASTER1", "@TricksMastar1"]
 
 # ==================== DATA FUNCTIONS ====================
 def load_data():

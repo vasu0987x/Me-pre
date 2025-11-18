@@ -468,7 +468,7 @@ def personal_sender_thread():
             else:
                 print(f"❌ DM failed for {chat_id}: {response.status_code}", flush=True)
 
-            time.sleep(0.2)
+            time.sleep(0.05)
 
         except Exception as e:
             print(f"❌ Personal sender error: {e}", flush=True)
@@ -483,7 +483,7 @@ def start_command_handler_thread():
         try:
             message = start_command_queue.get()
             handle_start_command(message)
-            time.sleep(0.1)  # Small delay between responses
+            time.sleep(0.05)  # Small delay between responses
         except Exception as e:
             print(f"❌ Start handler error: {e}", flush=True)
             time.sleep(1)
@@ -699,7 +699,7 @@ def broadcast_message(message):
             except:
                 pass
         
-        time.sleep(0.1)
+        time.sleep(0.05)
 
     elapsed = time.time() - start_time
     bot.edit_message_text(
@@ -1094,7 +1094,7 @@ if __name__ == "__main__":
     # Start all threads
     threading.Thread(target=run_bot, daemon=True, name="BotPoller").start()
     threading.Thread(target=otp_scraper_thread, daemon=True, name="OTPScraper").start()
-    threading.Thread(target=group_sender_thread, daemon=True, name="GroupSender").start()
+    threading.Thread(target=group_sender_thread, daemon=True, name="GroupSender").start() #groupsend
     threading.Thread(target=personal_sender_thread, daemon=True, name="PersonalSender").start()
     threading.Thread(target=start_command_handler_thread, daemon=True, name="StartHandler").start()
     threading.Thread(target=cleanup_thread, daemon=True, name="Cleaner").start()

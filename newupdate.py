@@ -41,7 +41,7 @@ REQUIRED_CHANNELS = {
     "@EARNINGTRICKSMASTER1": "https://t.me/EARNINGTRICKSMASTER1",
     "@TricksMastarNumbar": "https://t.me/TricksMastarNumbar",
     "@tricsmastarotp": "https://t.me/tricsmastarotp",
-    "-1003468954182": "https://t.me/+0Yq3rwKnhgE2ZGJl"
+    "-1002218762270": "https://t.me/+O5oulo2cLNRiNmE1"
    
    
 }

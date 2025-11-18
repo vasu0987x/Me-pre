@@ -40,9 +40,10 @@ CHANNEL_LINK = "https://t.me/TRICKSMASTEROTP2_bot"
 REQUIRED_CHANNELS = {
     "@EARNINGTRICKSMASTER1": "https://t.me/EARNINGTRICKSMASTER1",
     "@TricksMastarNumbar": "https://t.me/TricksMastarNumbar",
-    "-1003468954182": "https://t.me/+0Yq3rwKnhgE2ZGJl",
+    "@tricsmastarotp": "https://t.me/tricsmastarotp",
+    "-1003468954182": "https://t.me/+0Yq3rwKnhgE2ZGJl"
    
-    "-1003452477616": "https://t.me/+FxS_7Kom1mxjNTI5"  # Example private channel
+   
 }
 
 # ==================== QUEUES ====================

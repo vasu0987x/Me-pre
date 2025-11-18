@@ -29,7 +29,7 @@ os.makedirs(NUMBERS_DIR, exist_ok=True)
 # API Config
 API_TOKEN = os.getenv("API_TOKEN")
 BASE_URL = "http://147.135.212.197/crapi/s1t"
-OTP_GROUP_ID = "-1002784314709"
+OTP_GROUP_ID = "-1002774502308"
 BACKUP = "https://t.me/TricksMastarNumbar"
 CHANNEL_LINK = "https://t.me/TRICKSMASTEROTP2_bot"
 
